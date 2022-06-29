@@ -14,6 +14,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.kiriku.ui.screens.addNotesScreen
 import com.example.kiriku.ui.screens.notesScreen
 import com.example.kiriku.ui.theme.KirikuTheme
 import com.example.kiriku.ui.viewmodel.NotesViewModel
@@ -32,10 +36,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    val context = LocalContext.current as ViewModelStoreOwner
-                    val viewModel = ViewModelProvider(context).get(NotesViewModel::class.java)
-                    val lifecycleOwner = LocalContext.current as LifecycleOwner
-                    notesScreen(notesScreenUiState = viewModel.notesscreenuistate, lifecycleOwner = lifecycleOwner)
+
+                   navGraph()
                 }
             }
         }
@@ -43,14 +45,21 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
+fun navGraph(){
 
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    KirikuTheme {
-        Greeting("Android")
+    val context = LocalContext.current as ViewModelStoreOwner
+    val viewModel = ViewModelProvider(context).get(NotesViewModel::class.java)
+    val lifecycleOwner = LocalContext.current as LifecycleOwner
+    val notesScreenUiState = viewModel.notesscreenuistate
+    val navcontroller = rememberNavController()
+
+    NavHost(navController = navcontroller, startDestination = "noteslist"){
+        composable("noteslist"){
+            notesScreen(notesScreenUiState = notesScreenUiState, lifecycleOwner = lifecycleOwner, navController = navcontroller)
+        }
+        composable("addnotes"){
+            addNotesScreen(viewModel = viewModel, navController = navcontroller)
+        }
+
     }
 }
